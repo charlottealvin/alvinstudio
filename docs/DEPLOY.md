@@ -114,8 +114,8 @@ sudo npm install -g pm2
 
 ```bash
 cd /var/www
-git clone https://github.com/fan18660557495/fanstudio.git
-cd fanstudio
+git clone https://github.com/fan18660557495/alvinstudio.git
+cd alvinstudio
 npm install
 ```
 
@@ -136,7 +136,7 @@ cp .env.example .env
 
 | 变量 | 填写内容 | 说明 |
 |---|---|---|
-| `DATABASE_URL` | `mysql://用户名:密码@localhost:3306/fanstudio` | 把用户名和密码替换为实际值 |
+| `DATABASE_URL` | `mysql://用户名:密码@localhost:3306/alvinstudio` | 把用户名和密码替换为实际值 |
 | `AUTH_SECRET` | 执行 `openssl rand -base64 32` 生成 | **必须重新生成，不能用默认值** |
 | `AUTH_URL` | `https://你的域名` | 生产环境必须是实际域名 |
 | `NEXT_PUBLIC_SITE_URL` | `https://你的域名` | 与 AUTH_URL 一致 |
@@ -179,11 +179,11 @@ sudo mysql -u root -p
 ```
 
 ```sql
-CREATE DATABASE fanstudio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE alvinstudio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- 如果你不想用 root 连接，可以创建专用用户：
-CREATE USER 'fanstudio'@'localhost' IDENTIFIED BY '你的密码';
-GRANT ALL PRIVILEGES ON fanstudio.* TO 'fanstudio'@'localhost';
+CREATE USER 'alvinstudio'@'localhost' IDENTIFIED BY '你的密码';
+GRANT ALL PRIVILEGES ON alvinstudio.* TO 'alvinstudio'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
@@ -211,7 +211,7 @@ Seed 创建的默认管理员：
 npm run build
 
 # 用 PM2 启动
-pm2 start npm --name fanstudio -- start
+pm2 start npm --name alvinstudio -- start
 
 # 保存进程列表（服务器重启后自动恢复）
 pm2 save
@@ -232,9 +232,9 @@ curl http://localhost:3000
 
 ```bash
 pm2 status              # 查看进程状态
-pm2 logs fanstudio      # 查看实时日志
-pm2 restart fanstudio   # 重启
-pm2 stop fanstudio      # 停止
+pm2 logs alvinstudio      # 查看实时日志
+pm2 restart alvinstudio   # 重启
+pm2 stop alvinstudio      # 停止
 ```
 
 ### 6. 配置 Nginx 反向代理
@@ -242,7 +242,7 @@ pm2 stop fanstudio      # 停止
 创建站点配置：
 
 ```bash
-sudo nano /etc/nginx/sites-available/fanstudio
+sudo nano /etc/nginx/sites-available/alvinstudio
 ```
 
 写入以下内容（把 `your-domain.com` 替换为实际域名）：
@@ -257,7 +257,7 @@ server {
 
     # 上传的图片由 Nginx 直接返回（性能更好）
     location /uploads/ {
-        alias /var/www/fanstudio/public/uploads/;
+        alias /var/www/alvinstudio/public/uploads/;
         expires 30d;
         add_header Cache-Control "public, immutable";
         access_log off;
@@ -299,7 +299,7 @@ server {
 启用站点并重载 Nginx：
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/fanstudio /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/alvinstudio /etc/nginx/sites-enabled/
 sudo nginx -t          # 测试配置是否正确
 sudo systemctl reload nginx
 ```
@@ -339,19 +339,19 @@ Certbot 会自动添加 cron 任务，证书到期前自动续签。
 
 ```bash
 # 将上传目录移到项目外
-sudo mkdir -p /data/fanstudio-uploads
-sudo mv /var/www/fanstudio/public/uploads/* /data/fanstudio-uploads/ 2>/dev/null
-sudo rmdir /var/www/fanstudio/public/uploads
+sudo mkdir -p /data/alvinstudio-uploads
+sudo mv /var/www/alvinstudio/public/uploads/* /data/alvinstudio-uploads/ 2>/dev/null
+sudo rmdir /var/www/alvinstudio/public/uploads
 
 # 创建软链接
-ln -s /data/fanstudio-uploads /var/www/fanstudio/public/uploads
+ln -s /data/alvinstudio-uploads /var/www/alvinstudio/public/uploads
 ```
 
 这样即使重新部署项目，上传的文件也不会丢失。同时 Nginx 配置中的 `alias` 也需要对应修改：
 
 ```nginx
 location /uploads/ {
-    alias /data/fanstudio-uploads/;
+    alias /data/alvinstudio-uploads/;
     # ...
 }
 ```
@@ -361,13 +361,13 @@ location /uploads/ {
 如果启用微信支付，需要在项目根目录创建 `cert/` 目录并放入证书：
 
 ```bash
-mkdir -p /var/www/fanstudio/cert
+mkdir -p /var/www/alvinstudio/cert
 # 将下载的证书文件上传到服务器后：
-cp apiclient_key.pem /var/www/fanstudio/cert/
-cp apiclient_cert.pem /var/www/fanstudio/cert/
+cp apiclient_key.pem /var/www/alvinstudio/cert/
+cp apiclient_cert.pem /var/www/alvinstudio/cert/
 
 # 设置严格权限
-chmod 600 /var/www/fanstudio/cert/*.pem
+chmod 600 /var/www/alvinstudio/cert/*.pem
 ```
 
 ### 安全清单
@@ -388,7 +388,7 @@ chmod 600 /var/www/fanstudio/cert/*.pem
 ### 代码更新
 
 ```bash
-cd /var/www/fanstudio
+cd /var/www/alvinstudio
 
 # 拉取最新代码
 git pull origin main
@@ -403,14 +403,14 @@ npx prisma migrate deploy
 npm run build
 
 # 重启应用
-pm2 restart fanstudio
+pm2 restart alvinstudio
 ```
 
 ### 数据库备份
 
 ```bash
 # 手动备份
-mysqldump -u root -p fanstudio > /data/backups/fanstudio_$(date +%Y%m%d_%H%M%S).sql
+mysqldump -u root -p alvinstudio > /data/backups/alvinstudio_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 推荐设置定时自动备份：
@@ -422,7 +422,7 @@ sudo crontab -e
 添加一行（每天凌晨 3 点备份）：
 
 ```
-0 3 * * * mysqldump -u root -p'你的密码' fanstudio | gzip > /data/backups/fanstudio_$(date +\%Y\%m\%d).sql.gz
+0 3 * * * mysqldump -u root -p'你的密码' alvinstudio | gzip > /data/backups/alvinstudio_$(date +\%Y\%m\%d).sql.gz
 ```
 
 > 记得定期清理旧备份文件，防止磁盘占满。
@@ -431,8 +431,8 @@ sudo crontab -e
 
 ```bash
 # 应用日志
-pm2 logs fanstudio
-pm2 logs fanstudio --lines 100    # 最近 100 行
+pm2 logs alvinstudio
+pm2 logs alvinstudio --lines 100    # 最近 100 行
 
 # Nginx 访问日志
 tail -f /var/log/nginx/access.log
@@ -470,7 +470,7 @@ echo '/swapfile swap swap defaults 0 0' | sudo tee -a /etc/fstab
 lsof -i :3000
 
 # 或者改用其他端口
-PORT=3001 pm2 start npm --name fanstudio -- start
+PORT=3001 pm2 start npm --name alvinstudio -- start
 # 同时修改 Nginx 配置中的 proxy_pass 端口
 ```
 
@@ -485,7 +485,7 @@ PORT=3001 pm2 start npm --name fanstudio -- start
 1. 确认 `WECHAT_PAY_NOTIFY_URL` 是 HTTPS 地址且公网可访问
 2. 确认 Nginx 配置了 `X-Forwarded-Proto` header
 3. 检查服务器防火墙是否允许外网访问 443 端口
-4. 查看 `pm2 logs fanstudio` 中是否有支付相关错误
+4. 查看 `pm2 logs alvinstudio` 中是否有支付相关错误
 
 ### 数据库连接超时
 

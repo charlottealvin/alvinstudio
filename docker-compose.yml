@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: alvinstudio-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3333}:3000"
+    environment:
+      - DATABASE_URL=mysql://alvinstudio:${DB_PASSWORD:-alvinstudio123}@db:3306/alvinstudio
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3333}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-change-this-secret-in-production}
+      - NODE_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - alvinstudio-network
+    volumes:
+      - uploads-data:/app/public/uploads
+
+  db:
+    image: mysql:8.0
+    container_name: alvinstudio-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-root123}
+      - MYSQL_DATABASE=alvinstudio
+      - MYSQL_USER=alvinstudio
+      - MYSQL_PASSWORD=${DB_PASSWORD:-alvinstudio123}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - alvinstudio-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  alvinstudio-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  uploads-data:
