@@ -120,7 +120,7 @@ model post {
 
 model settings {
   id             String   @id @default("settings")
-  siteName       String   @default("Fan's Studio") @db.VarChar(255)
+  siteName       String   @default("Alvin's Studio") @db.VarChar(255)
   avatar         String?  @db.Text
   socialLinks    Json?
   about          Json?

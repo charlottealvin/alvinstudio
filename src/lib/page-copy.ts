@@ -47,7 +47,7 @@ export const defaultPageCopy: PageCopy = {
 export const defaultSiteDescription = defaultPageCopy.siteDescription!
 
 /** 网站名称默认值（API、后台、前台 fallback 共用） */
-export const defaultSiteName = "Fan's Studio"
+export const defaultSiteName = "Alvin's Studio"
 
 /** 个人信息展示默认值（Hero、关于页、作者 fallback 共用） */
 export const defaultPersonalName = "范米花儿"

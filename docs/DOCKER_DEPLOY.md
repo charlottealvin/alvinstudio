@@ -1,6 +1,6 @@
 # Docker 部署指南
 
-本文档介绍如何使用 Docker 部署 FanStudio 个人博客网站。
+本文档介绍如何使用 Docker 部署 AlvinStudio 个人博客网站。
 
 ## 前置要求
 
@@ -14,8 +14,8 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/fan18660557495/fanstudio.git
-cd fanstudio
+git clone https://github.com/fan18660557495/alvinstudio.git
+cd alvinstudio
 ```
 
 ### 2. 创建环境变量文件
@@ -64,12 +64,12 @@ docker-compose up -d
 2. **上传项目文件**
    ```bash
    # 在服务器上创建目录
-   mkdir -p /opt/fanstudio
-   cd /opt/fanstudio
-   
-   # 上传项目文件（使用 scp 或 sftp）
-   # 或直接 git clone
-   git clone https://github.com/fan18660557495/fanstudio.git .
+  mkdir -p /opt/alvinstudio
+  cd /opt/alvinstudio
+  
+  # 上传项目文件（使用 scp 或 sftp）
+  # 或直接 git clone
+  git clone https://github.com/fan18660557495/alvinstudio.git .
    ```
 
 3. **创建环境变量**
@@ -102,12 +102,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: fanstudio-app
+    container_name: alvinstudio-app
     restart: unless-stopped
     ports:
       - "3333:3000"
     environment:
-      - DATABASE_URL=mysql://fanstudio:fanstudio123@db:3306/fanstudio
+      - DATABASE_URL=mysql://alvinstudio:alvinstudio123@db:3306/alvinstudio
       - NEXTAUTH_URL=https://your-domain.com
       - NEXTAUTH_SECRET=your-secret-key
       - NODE_ENV=production
@@ -115,23 +115,23 @@ services:
       db:
         condition: service_healthy
     networks:
-      - fanstudio-network
+      - alvinstudio-network
     volumes:
       - uploads-data:/app/public/uploads
 
   db:
     image: mysql:8.0
-    container_name: fanstudio-db
+    container_name: alvinstudio-db
     restart: unless-stopped
     environment:
       - MYSQL_ROOT_PASSWORD=root123
-      - MYSQL_DATABASE=fanstudio
-      - MYSQL_USER=fanstudio
-      - MYSQL_PASSWORD=fanstudio123
+      - MYSQL_DATABASE=alvinstudio
+      - MYSQL_USER=alvinstudio
+      - MYSQL_PASSWORD=alvinstudio123
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
-      - fanstudio-network
+      - alvinstudio-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -140,7 +140,7 @@ services:
       start_period: 30s
 
 networks:
-  fanstudio-network:
+  alvinstudio-network:
     driver: bridge
 
 volumes:
@@ -148,7 +148,7 @@ volumes:
   uploads-data:
 ```
 
-4. 设置工作目录为 `/opt/fanstudio`
+4. 设置工作目录为 `/opt/alvinstudio`
 5. 点击「创建」
 
 ---
@@ -242,7 +242,7 @@ server {
 | `NEXTAUTH_SECRET` | NextAuth 密钥 | - | 是 |
 | `PORT` | 应用端口 | 3333 | 否 |
 | `DB_ROOT_PASSWORD` | MySQL root 密码 | root123 | 否 |
-| `DB_PASSWORD` | 应用数据库密码 | fanstudio123 | 否 |
+| `DB_PASSWORD` | 应用数据库密码 | alvinstudio123 | 否 |
 
 ### 邮件服务（可选）
 
@@ -342,17 +342,17 @@ docker-compose exec app npx prisma db seed
 
 ```bash
 # 备份数据库
-docker-compose exec db mysqldump -u root -p fanstudio > backup_$(date +%Y%m%d).sql
+docker-compose exec db mysqldump -u root -p alvinstudio > backup_$(date +%Y%m%d).sql
 
 # 恢复数据库
-docker-compose exec -T db mysql -u root -p fanstudio < backup.sql
+docker-compose exec -T db mysql -u root -p alvinstudio < backup.sql
 ```
 
 ### 备份上传文件
 
 ```bash
 # 备份上传目录
-docker cp fanstudio-app:/app/public/uploads ./uploads_backup
+docker cp alvinstudio-app:/app/public/uploads ./uploads_backup
 ```
 
 ---
@@ -399,7 +399,7 @@ docker-compose up -d
 ## 文件结构
 
 ```
-fanstudio/
+alvinstudio/
 ├── Dockerfile              # Docker 镜像构建文件
 ├── docker-compose.yml      # Docker Compose 编排文件
 ├── .dockerignore           # Docker 构建忽略文件
